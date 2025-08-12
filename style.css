@@ -1,0 +1,162 @@
+/* === General Reset === */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #0d1117, #1b2735);
+    color: #e6e6e6;
+    margin: 0;
+    padding: 0;
+    font-weight: bold;
+    min-height: 100vh;
+    background-image: url('trophy.png'), url('dumbbell.png'), url('barbell.png');
+    background-repeat: no-repeat, no-repeat, no-repeat;
+    background-position: top 50px left 20px, bottom 100px right 50px, top 200px right 30px;
+    background-size: 80px, 100px, 120px;
+}
+
+/* === Header === */
+header {
+    background: linear-gradient(90deg, #0f172a, #1e3a8a, #0f172a);
+    text-align: center;
+    padding: 2rem 1rem;
+    border-bottom: 3px solid #2563eb;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.5);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    color: #60a5fa;
+    text-shadow: 2px 2px 8px rgba(37, 99, 235, 0.8);
+}
+
+header p {
+    font-size: 1.1rem;
+    color: #cbd5e1;
+    margin-top: 5px;
+}
+
+/* === Motivational Quote === */
+.quote {
+    text-align: center;
+    font-size: 1.3rem;
+    margin: 1.5rem;
+    color: #93c5fd;
+    font-style: italic;
+}
+
+/* === Habit Input Section === */
+.habit-input {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 2rem auto;
+    max-width: 600px;
+    padding: 1rem;
+}
+
+.habit-input input {
+    padding: 0.8rem;
+    width: 280px;
+    border-radius: 8px;
+    border: 2px solid #3b82f6;
+    background: #1e293b;
+    color: white;
+}
+
+.habit-input button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.habit-input button:hover {
+    background: #1d4ed8;
+    box-shadow: 0 0 10px #3b82f6;
+}
+
+/* === Habit List === */
+.habit-list {
+    max-width: 600px;
+    margin: auto;
+    background: #1e293b;
+    border: 2px solid #3b82f6;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0px 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.habit {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.7rem;
+    border-bottom: 1px solid #334155;
+}
+
+.habit button {
+    background: #22c55e;
+    border: none;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.habit button:hover {
+    background: #16a34a;
+    box-shadow: 0 0 8px #22c55e;
+}
+
+/* === Chart Sections === */
+.chart-section {
+    max-width: 600px;
+    margin: 2rem auto;
+    background: #1e293b;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(37, 99, 235, 0.3);
+    border: 2px solid #3b82f6;
+}
+
+/* === XP Section === */
+.xp-section {
+    text-align: center;
+    margin: 2rem auto;
+    background: #1e293b;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px solid #3b82f6;
+    max-width: 400px;
+    box-shadow: 0px 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* === Footer === */
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 1rem;
+    color: #94a3b8;
+    border-top: 2px solid #2563eb;
+    margin-top: 2rem;
+}
+.weekly-progress {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+    height: 40px;
+    width: 100px;
+    background: #111827;
+    padding: 2px;
+    border-radius: 4px;
+}
+
+.week-bar {
+    flex: 1;
+    border-radius: 2px;
+    transition: height 0.3s ease;
+}
