@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Habbigame Tracker</title>
+<style>
+  body { background-color: #f5f5f5; color: #333; font-family: Arial, sans-serif; padding: 20px; }
+  h1, h2 { color: #ff6600; text-align: center; }
+  .container { max-width: 900px; margin: auto; }
+  input, button { padding: 12px; margin: 5px; border-radius: 5px; border: none; font-size: 14px; }
+  button { cursor: pointer; background-color: #ff6600; color: #fff; font-weight: bold; transition: background 0.2s; }
+  button:hover { background-color: #e65c00; }
+  .habit, .todo { background: #fff; padding: 10px; border-radius: 8px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  canvas { background-color: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container">
+  <h1>Habbigame Tracker</h1>
+  <p style="text-align:center;">Points: <span id="points">0</span></p>
+  <input type="text" id="habitName" placeholder="Enter habit">
+  <button id="addHabitBtn">Add Habit</button>
+  <div id="habits"></div>
+  <canvas id="progressChart" width="400" height="200"></canvas>
+
+  <h2>Weekly Streak & Points</h2>
+  <table>
+    <thead>
+      <tr><th>Habit</th><th>Streak (days)</th><th>Points</th></tr>
+    </thead>
+    <tbody id="streakTable"></tbody>
+  </table>
+
+  <h2>To-Do List</h2>
+  <input type="text" id="todoName" placeholder="Enter task">
+  <button id="addTodoBtn">Add Task</button>
+  <div id="todos"></div>
+
+  <h2>Timer</h2>
+  <p id="timer">00:00</p>
+  <button id="startTimer">Start</button>
+  <button id="resetTimer">Reset</button>
+
+  <button id="resetWeek" style="margin-top:20px; background-color:#cc0000;">Weekly Reset</button>
+</div>
+<script>
+  let habits = JSON.parse(localStorage.getItem('habits')) || [];
+  let todos = JSON.parse(localStorage.getItem('todos')) || [];
+  let points = parseInt(localStorage.getItem('points')) || 0;
+
+  const habitNameInput = document.getElementById('habitName');
+  const habitsDiv = document.getElementById('habits');
+  const todoNameInput = document.getElementById('todoName');
+  const todosDiv = document.getElementById('todos');
+  const pointsDisplay = document.getElementById('points');
+  const streakTable = document.getElementById('streakTable');
+
+  function save() {
+    localStorage.setItem('habits', JSON.stringify(habits));
+    localStorage.setItem('todos', JSON.stringify(todos));
+    localStorage.setItem('points', points);
+  }
+
+  function renderHabits() {
+    habitsDiv.innerHTML = '';
+    habits.forEach((h, i) => {
+      const div = document.createElement('div');
+      div.className = 'habit';
+      div.innerHTML = `<span>${h.name} - ${h.progress}%</span>
+        <div>
+          <button onclick="updateProgress(${i}, 10)">+10%</button>
+          <button onclick="deleteHabit(${i})">Delete</button>
+        </div>`;
+      habitsDiv.appendChild(div);
+    });
+    updateChart();
+    renderStreakTable();
+  }
+
+  function renderTodos() {
+    todosDiv.innerHTML = '';
+    todos.forEach((t, i) => {
+      const div = document.createElement('div');
+      div.className = 'todo';
+      div.innerHTML = `<input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo(${i})"> ${t.name}
+        <div>
+          <button onclick="deleteTodo(${i})">Delete</button>
+        </div>`;
+      todosDiv.appendChild(div);
+    });
+  }
+
+  function renderStreakTable() {
+    streakTable.innerHTML = '';
+    habits.forEach(h => {
+      streakTable.innerHTML += `<tr><td>${h.name}</td><td>${h.streak || 0}</td><td>${h.points || 0}</td></tr>`;
+    });
+  }
+
+  function addHabit() {
+    const name = habitNameInput.value.trim();
+    if (!name) return;
+    habits.push({ name, progress: 0, streak: 0, points: 0 });
+    habitNameInput.value = '';
+    save();
+    renderHabits();
+  }
+
+  function updateProgress(index, amount) {
+    habits[index].progress = Math.min(100, habits[index].progress + amount);
+    habits[index].points = (habits[index].points || 0) + amount;
+    habits[index].streak = (habits[index].streak || 0) + 1;
+    points += amount;
+    save();
+    renderHabits();
+    pointsDisplay.textContent = points;
+  }
+
+  function deleteHabit(index) {
+    habits.splice(index, 1);
+    save();
+    renderHabits();
+  }
+
+  function addTodo() {
+    const name = todoNameInput.value.trim();
+    if (!name) return;
+    todos.push({ name, done: false });
+    todoNameInput.value = '';
+    save();
+    renderTodos();
+  }
+
+  function toggleTodo(index) {
+    todos[index].done = !todos[index].done;
+    save();
+    renderTodos();
+  }
+
+  function deleteTodo(index) {
+    todos.splice(index, 1);
+    save();
+    renderTodos();
+  }
+
+  document.getElementById('resetWeek').onclick = () => {
+    habits.forEach(h => { h.progress = 0; h.streak = 0; });
+    todos.forEach(t => t.done = false);
+    points = 0;
+    save();
+    renderHabits();
+    renderTodos();
+    pointsDisplay.textContent = points;
+  };
+
+  let timer;
+  let seconds = 0;
+  document.getElementById('startTimer').onclick = () => {
+    clearInterval(timer);
+    timer = setInterval(() => {
+      seconds++;
+      let m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      let s = String(seconds % 60).padStart(2, '0');
+      document.getElementById('timer').textContent = `${m}:${s}`;
+    }, 1000);
+  };
+  document.getElementById('resetTimer').onclick = () => {
+    clearInterval(timer);
+    seconds = 0;
+    document.getElementById('timer').textContent = '00:00';
+  };
+
+  const ctx = document.getElementById('progressChart').getContext('2d');
+  let chart = new Chart(ctx, {
+    type: 'pie',
+    data: { labels: [], datasets: [{ data: [], backgroundColor: ['#ff6600', '#ffcc00', '#00ccff', '#33ff99'] }] },
+    options: { responsive: true }
+  });
+
+  function updateChart() {
+    chart.data.labels = habits.map(h => h.name);
+    chart.data.datasets[0].data = habits.map(h => h.progress);
+    chart.update();
+  }
+
+  document.getElementById('addHabitBtn').onclick = addHabit;
+  document.getElementById('addTodoBtn').onclick = addTodo;
+
+  renderHabits();
+  renderTodos();
+  pointsDisplay.textContent = points;
+</script>
+</body>
+</html>
+
